@@ -83,14 +83,14 @@ class SnakeGameAI:
         x = random.randint(0, (self.game_width - BLOCK_SIZE)//BLOCK_SIZE) * BLOCK_SIZE
         y = random.randint(0, (self.h - BLOCK_SIZE)//BLOCK_SIZE) * BLOCK_SIZE
         self.food = Point(x, y)
-        if(self.food in self.snake or self.food in self.mine):
+        if self.food in self.snake or self.food in self.mine:
             self._place_food()
 
     def _place_mine(self):
         x = random.randint(0, (self.game_width - BLOCK_SIZE)//BLOCK_SIZE) * BLOCK_SIZE
         y = random.randint(0, (self.h - BLOCK_SIZE)//BLOCK_SIZE) * BLOCK_SIZE
         new_mine = Point(x,y)
-        if(new_mine in self.mine or new_mine in self.snake or new_mine == self.food):
+        if new_mine in self.mine or new_mine in self.snake or new_mine == self.food:
             self._place_mine()
         else:
             self.mine.append(new_mine)
@@ -146,8 +146,13 @@ class SnakeGameAI:
             # remove last element of snake
             self.snake.pop()
 
-        if self.mine_interval >= self.speed/5:
-            self._place_mine()
+        if self.speed > 20:
+            if self.mine_interval >= self.speed/5:
+                self._place_mine()
+        else:
+            if self.mine_interval >= self.speed:
+                self._place_mine()
+        
 
         # 5. return game over and score
         game_over1  = False
@@ -155,8 +160,8 @@ class SnakeGameAI:
 
     def player_play_step(self):            
         # 2. move
-
-        p_snake.move(p_snake.direction)
+        if self.n_games in self.round_vs_player:
+            p_snake.move(p_snake.direction)
         # 3. check if game over
         p_snake.game_over = False
         if p_snake.is_collision():
@@ -164,8 +169,8 @@ class SnakeGameAI:
             p_snake.best_score = p_snake.score if p_snake.score > p_snake.best_score else p_snake.best_score
             return p_snake.game_over, p_snake.score, p_snake.best_score
         # 4. place new food or just move
-
-        p_snake.place_or_move()
+        if self.n_games in self.round_vs_player:
+            p_snake.place_or_move()
         # 6. return game over and score
         p_snake.game_over  = False
         p_snake.best_score = p_snake.score if p_snake.score > p_snake.best_score else p_snake.best_score
